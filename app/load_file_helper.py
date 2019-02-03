@@ -1,4 +1,5 @@
 import argparse
+import csv
 
 
 def process_args():
@@ -9,3 +10,14 @@ def process_args():
 
     args = parser.parse_args()
     return args.file
+
+# get the headers(first row) of the file
+def get_header_row(file_path):
+    try:
+        with open(file_path, newline='') as fl:
+          reader = csv.reader(fl)
+          row_header = next(reader)
+
+        return row_header
+    except IOError:
+        return "Error Unable to read file:", file_path
