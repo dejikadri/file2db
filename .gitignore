@@ -1,3 +1,4 @@
 file2db-env
 .idea/
 app/__pycache__/*
+.DS_Store

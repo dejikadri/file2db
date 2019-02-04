@@ -1,5 +1,12 @@
 import argparse
 import csv
+import logging
+import sqlite3
+import db_helper as dbh
+import sys
+
+
+logging.basicConfig(filename='log/app.log', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
 def process_args():
@@ -19,5 +26,54 @@ def get_header_row(file_path):
           row_header = next(reader)
 
         return row_header
-    except IOError:
+    except IOError as e:
+        logging.error(e)
+        return "Error Unable to read file:", file_path
+
+def create_table():
+    pass
+
+
+def load_file_to_table(file_path, table_name=None):
+    """
+
+    :param file_path:
+    :param table_name:
+    :return:
+    """
+    try:
+        # conn = dbh.connect_db()
+        # dbh.close_db_con(conn)
+        with open(file_path, newline='') as fl:
+          reader = csv.reader(fl, escapechar="'",  quotechar='"', delimiter=',', quoting=csv.QUOTE_NONE, skipinitialspace=True)
+
+          # skip the header row
+          next(reader)
+          conn = dbh.connect_db()
+          cur = conn.cursor()
+          records_inserted = 0
+
+          for row in reader:
+              id = int(row[0]) # convert id datatype to integer
+              year = int(row[1]) # convert year datatype to integer
+              age = int(row[2]) # convert age datatype to integer
+              name = row[3]
+              movie = row[4]
+
+              print(id, year, age, name, movie, f"INSERT INTO stars VALUES ({id}, {year}, {age}, '{name}', '{movie}')")
+
+              if cur.execute(f"INSERT INTO stars VALUES ({id}, {year}, {age}, '{name}', '{movie}')"):
+                  conn.commit()
+                  records_inserted += 1
+
+
+          rows_inserted = cur.execute(f"select count(*) from stars;")
+          rows_inserted.fetchone()[0]
+
+        dbh.close_db_con(conn)
+
+
+
+    except IOError as e:
+        logging.error(e)
         return "Error Unable to read file:", file_path
