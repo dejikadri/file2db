@@ -2,7 +2,7 @@ import argparse
 import csv
 import logging
 import sqlite3
-import db_helper as dbh
+import app.db_helper as dbh
 import sys
 
 
@@ -68,9 +68,10 @@ def load_file_to_table(file_path, table_name=None):
 
 
           rows_inserted = cur.execute(f"select count(*) from stars;")
-          rows_inserted.fetchone()[0]
+          rows_in_table = rows_inserted.fetchone()[0]
 
         dbh.close_db_con(conn)
+        return [rows_in_table, records_inserted]
 
 
 
